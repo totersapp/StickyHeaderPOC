@@ -9,10 +9,6 @@
 import UIKit
 
 public class StickyHeader: NSObject {
-
-    /**
-     The view containing the provided header.
-     */
     private(set) lazy var contentView: StickyHeaderView = {
         let view = StickyHeaderView()
         view.parent = self
@@ -20,111 +16,69 @@ public class StickyHeader: NSObject {
         return view
     }()
 
-    private weak var _scrollView: UIScrollView?
-
-    /**
-     The `UIScrollView` attached to the sticky header.
-     */
-    public weak var scrollView: UIScrollView? {
-        get {
-            return _scrollView
-        }
-
-        set {
-            if _scrollView != newValue {
-                _scrollView = newValue
-
-                if let scrollView = scrollView {
-                    scrollView.contentInset.top = self.height
-                    //                    self.adjustScrollViewTopInset(top: scrollView.contentInset.top + self.minimumHeight)
-                    scrollView.addSubview(self.contentView)
-                }
-
-                self.layoutContentView()
-            }
-        }
-    }
-
-    private var _view: UIView?
-
-    /**
-     The `UIScrollView attached to the sticky header.
-     */
-    public var view: UIView? {
-        set {
-            guard newValue != _view else { return }
-            _view = newValue
-            updateConstraints()
-        }
-        get {
-            return _view
-        }
-    }
-
-    private var _height: CGFloat = 0
-
-    /**
-     The height of the header.
-     */
-    public var height: CGFloat {
-        get { return _height }
-        set {
-            guard newValue != _height else { return }
-
-            if let scrollView = self.scrollView {
-                scrollView.contentInset.top = newValue
-                //                self.adjustScrollViewTopInset(top: scrollView.contentInset.top - height + newValue)
-            }
-
-            _height = newValue
-
-            self.updateConstraints()
-            self.layoutContentView()
-
-        }
-    }
-    private var _minimumHeight: CGFloat = 0
-
-    /**
-     The minimum height of the header.
-     */
-    public var minimumHeight: CGFloat {
-        get { return _minimumHeight }
-        set {
-            _minimumHeight = newValue
-            layoutContentView()
-        }
-    }
-
-    private func adjustScrollViewTopInset(top: CGFloat) {
-
-        guard let scrollView = self.scrollView else { return }
-        var inset = scrollView.contentInset
-
-        //Adjust content offset
-        var offset = scrollView.contentOffset
-        offset.y += inset.top - top
-        scrollView.contentOffset = offset
-
-        //Adjust content inset
-        inset.top = top
-        scrollView.contentInset = inset
-
+    private weak var scrollView: UIScrollView?
+    init(in scrollView: UIScrollView) {
         self.scrollView = scrollView
+        super.init()
+        scrollView.contentInset = .zero
+        scrollView.addSubview(self.contentView)
     }
 
-    private func updateConstraints() {
-        guard let view = self.view else { return }
+    private var view: UIView?
+    private var height: CGFloat = 0
+    private var minHeight: CGFloat = 0
+
+    public func attach(view: UIView, height: CGFloat, minHeight: CGFloat) {
+        guard self.view != view else { return }
+        if let currentView = self.view {
+            currentView.removeFromSuperview()
+        }
 
         view.removeFromSuperview()
-        self.contentView.addSubview(view)
         view.translatesAutoresizingMaskIntoConstraints = false
+
+        let size = view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize, withHorizontalFittingPriority: .defaultHigh, verticalFittingPriority: .defaultLow)
+        self.view = view
+        self.height = size.height
+        self.minHeight = minHeight
+
+        self.contentView.addSubview(view)
         NSLayoutConstraint.activate([
             view.leftAnchor.constraint(equalTo: self.contentView.leftAnchor),
             view.rightAnchor.constraint(equalTo: self.contentView.rightAnchor),
             view.topAnchor.constraint(equalTo: self.contentView.topAnchor),
             view.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor)
         ])
+
+        self.scrollView?.contentOffset.y = -self.height
+        self.scrollView?.contentInset = UIEdgeInsets(top: self.height, left: 0, bottom: 0, right: 0)
+    }
+
+    public func updateViewHeightIfNeeded() {
+        guard let view = self.view else { return }
+        guard let scrollView = self.scrollView else { return }
+
+        let size = view.systemLayoutSizeFitting(
+            UIView.layoutFittingCompressedSize,
+            withHorizontalFittingPriority: .defaultHigh,
+            verticalFittingPriority: .defaultLow)
+
+        self.height = size.height
+        let offsetY = scrollView.contentOffset.y
+        let isHeaderCollapsed = (offsetY >= 0.0 || offsetY >= -self.minHeight)
+        if isHeaderCollapsed {
+            self.layoutContentView()
+        } else {
+            scrollView.contentInset = UIEdgeInsets(top: self.height, left: 0, bottom: 0, right: 0)
+            scrollView.contentOffset.y = -size.height
+        }
+
+
+//        self.layoutContentView()
+    }
+
+    public func minimizeHeader() {
+        self.scrollView?.contentInset = UIEdgeInsets(top: self.minHeight, left: 0, bottom: 0, right: 0)
     }
 
     private func layoutContentView() {
@@ -137,33 +91,39 @@ public class StickyHeader: NSObject {
         if scrollView.contentOffset.y <= -self.height {
             relativeYOffset = scrollView.contentOffset.y
             height = abs(scrollView.contentOffset.y)
-            topInset = max(self.height, abs(scrollView.contentOffset.y) - self.minimumHeight)
+            topInset = self.height
             print("EXTENDED: \(topInset)")
-        } else if scrollView.contentOffset.y < -self.minimumHeight {
+        } else if scrollView.contentOffset.y < -self.minHeight {
             relativeYOffset = -self.height
             height = self.height
-            topInset = abs(scrollView.contentOffset.y)
+            topInset = self.height
             print("STANDARD: \(topInset) - \(scrollView.contentOffset.y)")
         } else {
-            let compensation: CGFloat = -self.minimumHeight - scrollView.contentOffset.y
+            let compensation: CGFloat = -self.minHeight - scrollView.contentOffset.y
             relativeYOffset = -self.height - compensation
             height = self.height
-            scrollView.contentInset.top = self.minimumHeight
+            topInset = self.minHeight
             print("MIN")
         }
-        //        print("off - y - height: \(scrollView.contentOffset.y) - \(relativeYOffset) - \(height)")
-        let frame = CGRect(x: 0, y: relativeYOffset, width: scrollView.frame.size.width, height: height)
+        if scrollView.contentInset.top != topInset {
+            scrollView.contentInset.top = topInset
+        }
 
-        self.contentView.layer.borderWidth = 3
-        self.contentView.layer.borderColor = UIColor.green.cgColor
+        let frame = CGRect(x: 0, y: relativeYOffset, width: scrollView.frame.size.width, height: height)
         self.contentView.frame = frame
     }
 
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if let path = keyPath, context == &StickyHeaderView.KVOContext && path == "contentOffset" {
-            self.layoutContentView()
-        } else {
+        guard context == &StickyHeaderView.KVOContext, let path = keyPath else {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+            return
+        }
+
+        switch path {
+        case "contentOffset":
+            self.layoutContentView()
+        default:
+            return
         }
     }
 }

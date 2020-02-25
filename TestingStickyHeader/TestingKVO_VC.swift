@@ -18,8 +18,7 @@ extension UIScrollView {
             var header = objc_getAssociatedObject(self, &xoStickyHeaderKey) as? StickyHeader
 
             if header == nil {
-                header = StickyHeader()
-                header!.scrollView = self
+                header = StickyHeader(in: self)
                 objc_setAssociatedObject(self, &xoStickyHeaderKey, header, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             }
             return header!
@@ -34,7 +33,7 @@ class TestingKVO_VC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
     // MARK: Properties
     var navigationView = UIView()
-
+    var header: TestingHeader!
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.setNavigationBarHidden(true, animated: true)
@@ -54,34 +53,52 @@ class TestingKVO_VC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             self.automaticallyAdjustsScrollViewInsets = false
         }
 
-        let headerView = Bundle.main.loadNibNamed("MyHeaderView", owner: nil, options: nil)?.first as! MyHeaderView
-        headerView.layer.borderColor = UIColor.red.cgColor
-        headerView.layer.borderWidth = 5
-        table.stickyHeader.height = headerView.frame.height
-        table.stickyHeader.minimumHeight = 64
-        table.stickyHeader.view = headerView
+        self.header = TestingHeader()
+        self.header.delegate = self
+        self.header.configure(with: TestingHeader.ContentData(items: self.generateData(), buttons: 5))
+        self.header.set(width: self.view.bounds.width)
+        table.stickyHeader.attach(view: self.header, height: header.frame.height, minHeight: 64)
+    }
 
-        //        navigationView.frame = CGRect(x: 0, y: 0, width: headerView.frame.width, height: headerView.frame.height)
-        //        navigationView.backgroundColor = .green
-        //        navigationView.alpha = 0
-        //        table.stickyHeader.view = navigationView
+    private func generateData() -> [TestingView.ContentData] {
+        var items = [TestingView.ContentData]()
+        for i in 0..<Int.random(in: 2..<10) {
+            let data = TestingView.ContentData(
+                prefix: "\(i)",
+                color: UIColor.random(),
+                height: CGFloat.random(in: 20..<100).rounded()
+            )
+            print("\(data.color.toHex() ?? "") - \(data.height)")
+            items.append(data)
+        }
+        return items
     }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
-            //            self.table.scrollToRow(at: IndexPath(row: 0, section: 49), at: .top, animated: true)
+        self.startCarousel()
+    }
+
+    private func startCarousel() {
+        defer {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
+                self.startCarousel()
+            }
         }
+
+        self.header.configure(with: TestingHeader.ContentData(items: self.generateData(), buttons: 5))
+        self.header.set(width: self.view.bounds.width)
+        self.table.stickyHeader.updateViewHeightIfNeeded()
     }
 
     // MARK: Tableview
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 50
+        return 5
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 200
+        return 20
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -105,3 +122,11 @@ class TestingKVO_VC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
 }
 
+extension TestingKVO_VC: TestingHeaderDelegate {
+    func header(_ header: TestingHeader, didPressButtonAt index: Int) {
+        let ip = IndexPath(item: 0, section: index)
+        self.table.stickyHeader.minimizeHeader()
+        self.table.scrollToRow(at: ip, at: .top, animated: true)
+        print("Button pressed: \(index)")
+    }
+}
