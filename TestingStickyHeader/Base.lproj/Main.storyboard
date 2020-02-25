@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="FPS-qc-JNz">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="TestingStickyHeader" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DyU-qR-fp1">
+                                <rect key="frame" x="160.5" y="433" width="93" height="30"/>
+                                <state key="normal" title="StickyHeader"/>
+                                <connections>
+                                    <action selector="handleTap" destination="BYZ-38-t0r" eventType="touchUpInside" id="8fD-sq-IHZ"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jFy-Rh-4zS">
+                                <rect key="frame" x="181.5" y="481" width="51" height="30"/>
+                                <state key="normal" title="Header"/>
+                                <connections>
+                                    <action selector="handleTesingTap" destination="BYZ-38-t0r" eventType="touchUpInside" id="Jr2-j0-GRE"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Qs-gX-LX8">
+                                <rect key="frame" x="126.5" y="531" width="161" height="30"/>
+                                <state key="normal" title="CollectionViewScrolling"/>
+                                <connections>
+                                    <action selector="handleTesingScrollingTap" destination="BYZ-38-t0r" eventType="touchUpInside" id="mmw-FB-Bkh"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CSc-bz-ITY">
+                                <rect key="frame" x="142.5" y="569" width="129" height="30"/>
+                                <state key="normal" title="TableViewScrolling"/>
+                                <connections>
+                                    <action selector="handleTesingTableViewScrollingTap" destination="BYZ-38-t0r" eventType="touchUpInside" id="pRp-J4-Gem"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OfX-hd-WHg">
+                                <rect key="frame" x="121" y="607" width="172" height="30"/>
+                                <state key="normal" title="Table KVO Sticky Header"/>
+                                <connections>
+                                    <action selector="handleTesingKVOTableViewTap" destination="BYZ-38-t0r" eventType="touchUpInside" id="Jtt-Bx-7Nn"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="OfX-hd-WHg" firstAttribute="top" secondItem="CSc-bz-ITY" secondAttribute="bottom" constant="8" id="4NC-gt-Dlh"/>
+                            <constraint firstItem="CSc-bz-ITY" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="4Tm-6g-xcW"/>
+                            <constraint firstItem="OfX-hd-WHg" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="4cQ-Gz-e51"/>
+                            <constraint firstItem="DyU-qR-fp1" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="Es1-Rq-F2G"/>
+                            <constraint firstItem="DyU-qR-fp1" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Gch-fA-Pj2"/>
+                            <constraint firstItem="9Qs-gX-LX8" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Ozp-6m-cQ6"/>
+                            <constraint firstItem="CSc-bz-ITY" firstAttribute="top" secondItem="9Qs-gX-LX8" secondAttribute="bottom" constant="8" id="VXY-B8-aLI"/>
+                            <constraint firstItem="jFy-Rh-4zS" firstAttribute="top" secondItem="DyU-qR-fp1" secondAttribute="bottom" constant="18" id="W0h-ck-4ZK"/>
+                            <constraint firstItem="9Qs-gX-LX8" firstAttribute="top" secondItem="jFy-Rh-4zS" secondAttribute="bottom" constant="20" id="gAR-so-AhO"/>
+                            <constraint firstItem="jFy-Rh-4zS" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="urd-VP-acy"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="9bE-Zz-PJe"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="139" y="138"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="lIe-ce-4G7">
+            <objects>
+                <navigationController id="FPS-qc-JNz" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="mN3-UL-aDD">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="dzp-J3-sSE"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="c8g-Xf-BGk" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1148" y="133"/>
+        </scene>
+    </scenes>
+</document>

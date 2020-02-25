@@ -1,0 +1,6 @@
+module Pods_TestingStickyHeader {
+  umbrella header "Pods-TestingStickyHeader-umbrella.h"
+
+  export *
+  module * { export * }
+}
